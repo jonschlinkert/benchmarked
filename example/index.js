@@ -2,8 +2,8 @@ var Suite = require('..');
 var suite = new Suite();
 
 var options = {
-  add: 'code/ends-with/*.js',
   fixtures: 'fixtures/*.txt',
+  add: 'code/*.js',
   cwd: 'example'
 };
 

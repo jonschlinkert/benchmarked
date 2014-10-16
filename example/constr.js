@@ -1,7 +1,7 @@
 var Suite = require('..');
 var suite = new Suite({
-  add: 'code/*.js',
   fixtures: 'fixtures/*.txt',
+  add: 'code/*.js',
   cwd: 'example'
 });
 

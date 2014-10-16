@@ -1,5 +1,6 @@
 'use strict';
 
+var path = require('path');
 var ansi = require('ansi');
 var chalk = require('chalk');
 var read = require('file-reader');
@@ -13,7 +14,12 @@ var cursor = ansi(process.stdout);
  */
 
 function Suite(options) {
-  this.options = extend({cwd: process.cwd()}, options);
+  this.options = extend({
+    cwd: process.cwd(),
+    name: function(filepath) {
+      return path.basename(filepath);
+    },
+  }, options);
 }
 
 /**
@@ -25,7 +31,7 @@ function Suite(options) {
  */
 
 Suite.prototype.fixtures = function(patterns, options) {
-  options = options || {cwd: this.options.cwd};
+  options = extend({}, this.options, options);
   this._fixtures = read(patterns, options);
   return this;
 };
@@ -39,7 +45,7 @@ Suite.prototype.fixtures = function(patterns, options) {
  */
 
 Suite.prototype.add = function(patterns, options) {
-  options = options || {cwd: this.options.cwd};
+  options = extend({}, this.options, options);
   this._add = read(patterns, options);
   return this;
 };
