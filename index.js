@@ -1,6 +1,7 @@
 'use strict';
 
 var path = require('path');
+var util = require('util');
 var ansi = require('ansi');
 var chalk = require('chalk');
 var read = require('file-reader');
@@ -14,6 +15,9 @@ var cursor = ansi(process.stdout);
  */
 
 function Suite(options) {
+  this._fixtures = {};
+  this._fns = {};
+
   this.options = extend({
     cwd: process.cwd(),
     name: function(filepath) {
@@ -46,7 +50,7 @@ Suite.prototype.fixtures = function(patterns, options) {
 
 Suite.prototype.add = function(patterns, options) {
   options = extend({}, this.options, options);
-  this._add = read(patterns, options);
+  this._fns = read(patterns, options);
   return this;
 };
 
@@ -71,11 +75,12 @@ Suite.prototype.run = function(options, cb, thisArg) {
 
   options = extend({}, this.options, options);
   var fixtures = this._fixtures;
-  var add = this._add;
+  var add = this._fns;
 
   if (options.fixtures) {
     fixtures = read(options.fixtures, options);
   }
+
   if (options.add) {
     add = read(options.add, options);
   }
@@ -87,10 +92,15 @@ Suite.prototype.run = function(options, cb, thisArg) {
 
     args = Array.isArray(args) ? args : [args];
 
+    var lead = '';
+    if (options.showArgs) {
+      lead = ' - ' + util.inspect(args, null, 2).replace(/[\s\n]+/g, ' ');
+    }
+
     var benchmark = new Benchmark.Suite(name, {
       name: name,
       onStart: function () {
-        console.log(chalk.magenta('\nBenchmark #%s: %s'), ++i, '"' + name + '"');
+        console.log(chalk.gray('\n#%s: %s'), ++i, name, lead);
       },
       onComplete: function () {
         cursor.write('\n');
@@ -98,14 +108,19 @@ Suite.prototype.run = function(options, cb, thisArg) {
     });
 
     forOwn(add, function (fn, fnName) {
+
+
       benchmark
         .add(fnName, {
           onCycle: function onCycle(event) {
             cursor.horizontalAbsolute();
             cursor.eraseLine();
-            cursor.write(' > ' + event.target);
+            cursor.write('  ' + event.target);
           },
           onComplete: function () {
+            if (options.expected) {
+              console.log('  expected: [' + chalk.bold(fn.apply(null, args)) + ']');
+            }
             cursor.write('\n');
           },
           fn: function () {
@@ -121,7 +136,9 @@ Suite.prototype.run = function(options, cb, thisArg) {
 
     benchmark
       .on('complete', function () {
-        console.log(chalk.cyan('Fastest is ' + this.filter('fastest').pluck('name')));
+        if (Object.keys(add).length > 1) {
+          console.log(chalk.gray('  fastest is ') + chalk.bold(this.filter('fastest').pluck('name')));
+        }
       })
 
     benchmark.run();

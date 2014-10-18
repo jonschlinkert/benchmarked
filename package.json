@@ -1,7 +1,7 @@
 {
   "name": "benchmarked",
   "description": "Easily generate benchmarks from a glob of files.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/jonschlinkert/benchmarked",
   "author": {
     "name": "Jon Schlinkert",
