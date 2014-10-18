@@ -113,7 +113,16 @@ Suite.prototype.run = function(options, cb, thisArg) {
             return;
           }
         });
+
+      if (options.sample) {
+        console.log('> ' + fnName + ':\n  %j', fn(options.sample));
+      }
     });
+
+    benchmark
+      .on('complete', function () {
+        console.log(chalk.cyan('Fastest is ' + this.filter('fastest').pluck('name')));
+      })
 
     benchmark.run();
   });
