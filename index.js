@@ -5,6 +5,7 @@ var util = require('util');
 var ansi = require('ansi');
 var chalk = require('chalk');
 var read = require('file-reader');
+var hasValue = require('has-value');
 var forOwn = require('for-own');
 var Benchmark = require('benchmark');
 var extend = require('extend-shallow');
@@ -100,7 +101,7 @@ Suite.prototype.run = function(options, cb, thisArg) {
     var benchmark = new Benchmark.Suite(name, {
       name: name,
       onStart: function () {
-        console.log(chalk.gray('\n#%s: %s'), ++i, name, lead);
+        console.log(chalk.gray('#%s: %s'), ++i, name, lead);
       },
       onComplete: function () {
         cursor.write('\n');
@@ -108,8 +109,6 @@ Suite.prototype.run = function(options, cb, thisArg) {
     });
 
     forOwn(add, function (fn, fnName) {
-
-
       benchmark
         .add(fnName, {
           onCycle: function onCycle(event) {
@@ -118,10 +117,16 @@ Suite.prototype.run = function(options, cb, thisArg) {
             cursor.write('  ' + event.target);
           },
           onComplete: function () {
-            if (options.expected) {
-              console.log('  expected: [' + chalk.bold(fn.apply(null, args)) + ']');
+            if (options.result) {
+              var res = fn.apply(null, args);
+              var msg = chalk.bold('%j');
+              if (!hasValue(res)) {
+                msg = chalk.red('%j');
+              }
+              console.log(chalk.gray('  result: ') + msg, res);
+            } else {
+              cursor.write('\n');
             }
-            cursor.write('\n');
           },
           fn: function () {
             fn.apply(thisArg, args);
@@ -130,7 +135,7 @@ Suite.prototype.run = function(options, cb, thisArg) {
         });
 
       if (options.sample) {
-        console.log('> ' + fnName + ':\n  %j', fn(options.sample));
+        console.log('> ' + fnName + ':\n  %j', fn.apply(null, options.sample));
       }
     });
 
