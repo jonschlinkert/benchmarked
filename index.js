@@ -65,7 +65,6 @@ Suite.prototype.add = function(patterns, options) {
  */
 
 Suite.prototype.run = function(options, cb, thisArg) {
-  var self = this;
   var i = 0;
 
   if (typeof options == 'function') {
@@ -144,7 +143,7 @@ Suite.prototype.run = function(options, cb, thisArg) {
         if (Object.keys(add).length > 1) {
           console.log(chalk.gray('  fastest is ') + chalk.bold(this.filter('fastest').pluck('name')));
         }
-      })
+      });
 
     benchmark.run();
   });
