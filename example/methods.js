@@ -1,6 +1,7 @@
+'use strict';
+
 var Suite = require('..');
 var suite = new Suite({cwd: 'example'});
-
 
 suite.fixtures('fixtures/*.txt');
 suite.add('code/*.js');
