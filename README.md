@@ -10,13 +10,6 @@ This is an opinionated wrapper for [benchmarked.js](http://benchmarkjs.com/) to 
 npm i benchmarked --save-dev
 ```
 
-## Running tests
-Install dev dependencies.
-
-```bash
-npm i -d && npm test
-```
-
 ## Usage
 
 ```js
@@ -87,6 +80,16 @@ var suite = new Suite({
     return path.basename(filepath);
   }
 });
+```
+
+## Contributing
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/benchmarked/issues)
+
+## Running tests
+Install dev dependencies.
+
+```bash
+npm i -d && npm test
 ```
 
 ## Author
