@@ -5,7 +5,7 @@ var util = require('util');
 var ansi = require('ansi');
 var chalk = require('chalk');
 var read = require('file-reader');
-var hasValue = require('has-value');
+var hasValues = require('has-values');
 var forOwn = require('for-own');
 var Benchmark = require('benchmark');
 var extend = require('extend-shallow');
@@ -21,8 +21,9 @@ function Suite(options) {
 
   this.options = extend({
     cwd: process.cwd(),
-    name: function(filepath) {
-      return path.basename(filepath);
+    name: function(fp) {
+      var ext = path.extname(fp);
+      return path.basename(fp, ext);
     },
   }, options);
 }
@@ -42,7 +43,7 @@ Suite.prototype.fixtures = function(patterns, options) {
 };
 
 /**
- * Define the functions to benchmark.
+ * Specify the functions to be benchmarked.
  *
  * @param  {String|Array} `patterns` Filepath(s) or glob patterns.
  * @param  {Options} `options`
@@ -108,42 +109,41 @@ Suite.prototype.run = function(options, cb, thisArg) {
     });
 
     forOwn(add, function (fn, fnName) {
-      benchmark
-        .add(fnName, {
-          onCycle: function onCycle(event) {
-            cursor.horizontalAbsolute();
-            cursor.eraseLine();
-            cursor.write('  ' + event.target);
-          },
-          onComplete: function () {
-            if (options.result) {
-              var res = fn.apply(null, args);
-              var msg = chalk.bold('%j');
-              if (!hasValue(res)) {
-                msg = chalk.red('%j');
-              }
-              console.log(chalk.gray('  result: ') + msg, res);
-            } else {
-              cursor.write('\n');
+      benchmark.add(fnName, {
+        onCycle: function onCycle(event) {
+          cursor.horizontalAbsolute();
+          cursor.eraseLine();
+          cursor.write('  ' + event.target);
+        },
+        onComplete: function () {
+          if (options.result) {
+            var res = fn.apply(null, args);
+            var msg = chalk.bold('%j');
+            if (!hasValues(res)) {
+              msg = chalk.red('%j');
             }
-          },
-          fn: function () {
-            fn.apply(thisArg, args);
-            return;
+            console.log(chalk.gray('  result: ') + msg, res);
+          } else {
+            cursor.write('\n');
           }
-        });
+        },
+        fn: function () {
+          fn.apply(thisArg, args);
+          return;
+        }
+      });
 
       if (options.sample) {
         console.log('> ' + fnName + ':\n  %j', fn.apply(null, options.sample));
       }
     });
 
-    benchmark
-      .on('complete', function () {
-        if (Object.keys(add).length > 1) {
-          console.log(chalk.gray('  fastest is ') + chalk.bold(this.filter('fastest').pluck('name')));
-        }
-      });
+    benchmark.on('complete', function () {
+      if (Object.keys(add).length > 1) {
+        var fastest = chalk.bold(this.filter('fastest').pluck('name'));
+        console.log(chalk.gray('  fastest is ') + fastest);
+      }
+    });
 
     benchmark.run();
   });
