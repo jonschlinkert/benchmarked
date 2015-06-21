@@ -128,7 +128,7 @@ Suite.prototype.run = function(options, cb, thisArg) {
           }
         },
         fn: function () {
-          fn.apply(thisArg, args);
+          fn.call(thisArg, args);
           return;
         }
       });
