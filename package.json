@@ -3,21 +3,12 @@
   "description": "Easily generate benchmarks from a glob of files.",
   "version": "0.1.4",
   "homepage": "https://github.com/jonschlinkert/benchmarked",
-  "author": {
-    "name": "Jon Schlinkert",
-    "url": "https://github.com/jonschlinkert"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/jonschlinkert/benchmarked.git"
-  },
+  "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+  "repository": "jonschlinkert/benchmarked",
   "bugs": {
     "url": "https://github.com/jonschlinkert/benchmarked/issues"
   },
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/jonschlinkert/benchmarked/blob/master/LICENSE"
-  },
+  "license": "MIT",
   "files": [
     "index.js"
   ],
@@ -39,5 +30,10 @@
   },
   "keywords": [
     "benchmark"
-  ]
+  ],
+  "verb": {
+    "related": {
+      "list": []
+    }
+  }
 }

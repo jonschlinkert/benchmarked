@@ -86,7 +86,7 @@ Suite.prototype.run = function(options, cb, thisArg) {
     add = read(options.add, options);
   }
 
-  forOwn(fixtures, function (args, name) {
+  forOwn(fixtures, function(args, name) {
     if (typeof cb == 'function') {
       args = cb(args);
     }
@@ -100,22 +100,22 @@ Suite.prototype.run = function(options, cb, thisArg) {
 
     var benchmark = new Benchmark.Suite(name, {
       name: name,
-      onStart: function () {
+      onStart: function() {
         console.log(chalk.gray('#%s: %s'), ++i, name, lead);
       },
-      onComplete: function () {
+      onComplete: function() {
         cursor.write('\n');
       }
     });
 
-    forOwn(add, function (fn, fnName) {
+    forOwn(add, function(fn, fnName) {
       benchmark.add(fnName, {
         onCycle: function onCycle(event) {
           cursor.horizontalAbsolute();
           cursor.eraseLine();
           cursor.write('  ' + event.target);
         },
-        onComplete: function () {
+        onComplete: function() {
           if (options.result) {
             var res = fn.apply(null, args);
             var msg = chalk.bold('%j');
@@ -127,7 +127,7 @@ Suite.prototype.run = function(options, cb, thisArg) {
             cursor.write('\n');
           }
         },
-        fn: function () {
+        fn: function() {
           fn.apply(thisArg, args);
           return;
         }
@@ -138,7 +138,7 @@ Suite.prototype.run = function(options, cb, thisArg) {
       }
     });
 
-    benchmark.on('complete', function () {
+    benchmark.on('complete', function() {
       if (Object.keys(add).length > 1) {
         var fastest = chalk.bold(this.filter('fastest').pluck('name'));
         console.log(chalk.gray('  fastest is ') + fastest);
