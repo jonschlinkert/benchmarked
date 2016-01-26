@@ -145,7 +145,7 @@ Suite.prototype.run = function(options, cb, thisArg) {
       }
     });
 
-    benchmark.run();
+    benchmark.run(options);
   });
 
   return this;
