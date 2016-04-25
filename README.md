@@ -1,25 +1,24 @@
-# benchmarked [![NPM version](https://img.shields.io/npm/v/benchmarked.svg)](https://www.npmjs.com/package/benchmarked)
+# benchmarked [![NPM version](https://img.shields.io/npm/v/benchmarked.svg?style=flat)](https://www.npmjs.com/package/benchmarked) [![NPM downloads](https://img.shields.io/npm/dm/benchmarked.svg?style=flat)](https://npmjs.org/package/benchmarked) [![Build Status](https://img.shields.io/travis/jonschlinkert/benchmarked.svg?style=flat)](https://travis-ci.org/jonschlinkert/benchmarked)
 
-> Easily generate benchmarks from a glob of files.
-
-This is an opinionated wrapper for [benchmark.js](http://benchmarkjs.com/) to make it easier to do benchmarks. Concept is from [remarkable](https://github.com/jonschlinkert/remarkable/tree/master/benchmark).
+Easily generate benchmarks from a glob of files.
 
 ## Install
 
 Install with [npm](https://www.npmjs.com/):
 
 ```sh
-$ npm i benchmarked
+$ npm install benchmarked --save
 ```
+
+This is an opinionated wrapper for [benchmarked.js](http://benchmarkjs.com/) to make it easier to do benchmarks. Concept is from [remarkable](https://github.com/jonschlinkert/remarkable/tree/master/benchmark)
 
 ## Usage
 
 ```js
-var Suite = require('benchmarked');
-var suite = new Suite({
-  cwd: 'benchmark', // optionally define a current working directory
-  add: 'my-functions/*.js', // path or glob pattern to functions
-  fixtures: 'my-fixtures/*.txt'  // path or glob pattern to fixtures
+var suite = require('benchmarked')({
+  cwd: 'benchmark',              // optionally define a base directory for code and fixtures
+  fixtures: 'my-fixtures/*.txt', // path or glob pattern to fixtures
+  code: 'my-functions/*.js'      // path or glob pattern to code files
 });
 
 // run the benchmarks
@@ -28,86 +27,123 @@ suite.run();
 
 See the [examples](./example) to get a better understanding of how this works.
 
-### Alternative setup
+## API
 
-Add functions to run:
+### [Benchmarked](index.js#L21)
 
-```js
-suite.add('benchmark/my-functions/*.js');
-```
+Create an instance of Benchmarked with the given `options`.
 
-Add fixtures to use:
+**Params**
 
-```js
-suite.fixtures('benchmark/my-fixtures/*.txt');
-```
+* `options` **{Object}**
 
-Run benchmarks for each fixture and function defined:
+**Example**
 
 ```js
-suite.run();
+var benchmarks = new Benchmarked();
 ```
 
-Pass additional arguments beyond the content in the fixtures:
+### [.addFixtures](index.js#L240)
+
+Add fixtures to run benchmarks against.
+
+**Params**
+
+* `patterns` **{String|Array}**: Filepaths or glob patterns.
+* `options` **{Options}**
+
+**Example**
 
 ```js
-// `fixture` is the content returned for each fixture
-suite.run(function (fixture) {
-  // this array will be applied as arguments to each function
-  return [fixture, ':'];
-});
+benchmarks.addFixtures('fixtures/*.txt');
 ```
 
-## Options
+### [.addCode](index.js#L256)
 
-### options.cwd
+Specify the functions to be benchmarked.
 
-Specify a current working directory to be used for both fixtures and functions:
+**Params**
+
+* `patterns` **{String|Array}**: Filepath(s) or glob patterns.
+* `options` **{Options}**
+
+**Example**
 
 ```js
-var suite = new Suite({cwd: 'example'});
+benchmarks.addCode('fixtures/*.txt');
 ```
 
-### options.name
+### [.addSuite](index.js#L268)
 
-Pass a custom naming function to be used on functions. This only changes the name
-that displays in the command line for each function:
+Add benchmark suite to the given `fixture` file.
+
+**Params**
+
+* `fixture` **{Object}**: vinyl file object
+
+### [.run](index.js#L322)
+
+Run the benchmarks.
+
+**Params**
+
+* `options` **{Object}**
+* `cb` **{Function}**
+* `thisArg` **{Object}**
+
+**Example**
 
 ```js
-var path = require('path');
-
-var suite = new Suite({
-  // this is the actual default
-  name: function(filepath) {
-    return path.basename(filepath);
-  }
-});
+benchmarks.run();
 ```
+
+## Related projects
+
+You might also be interested in these projects:
+
+* [base-cli](https://www.npmjs.com/package/base-cli): Plugin for base-methods that maps built-in methods to CLI args (also supports methods from a… [more](https://www.npmjs.com/package/base-cli) | [homepage](https://github.com/node-base/base-cli)
+* [base-option](https://www.npmjs.com/package/base-option): Adds a few options methods to base, like `option`, `enable` and `disable`. See the readme… [more](https://www.npmjs.com/package/base-option) | [homepage](https://github.com/node-base/base-option)
+* [base-pkg](https://www.npmjs.com/package/base-pkg): Plugin for adding a `pkg` method that exposes pkg-store to your base application. | [homepage](https://github.com/node-base/base-pkg)
+* [base](https://www.npmjs.com/package/base): base is the foundation for creating modular, unit testable and highly pluggable node.js applications, starting… [more](https://www.npmjs.com/package/base) | [homepage](https://github.com/node-base/base)
 
 ## Contributing
 
 Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/benchmarked/issues/new).
+
+## Building docs
+
+Generate readme and API documentation with [verb](https://github.com/verbose/verb):
+
+```sh
+$ npm install verb && npm run docs
+```
+
+Or, if [verb](https://github.com/verbose/verb) is installed globally:
+
+```sh
+$ verb
+```
 
 ## Running tests
 
 Install dev dependencies:
 
 ```sh
-$ npm i -d && npm test
+$ npm install -d && npm test
 ```
 
 ## Author
 
 **Jon Schlinkert**
 
-+ [github/jonschlinkert](https://github.com/jonschlinkert)
-+ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
+* [github/jonschlinkert](https://github.com/jonschlinkert)
+* [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
 
 ## License
 
-Copyright © 2014-2016 [Jon Schlinkert](https://github.com/jonschlinkert)
-Released under the MIT license.
+Copyright © 2016, [Jon Schlinkert](https://github.com/jonschlinkert).
+Released under the [MIT license](https://github.com/jonschlinkert/benchmarked/blob/master/LICENSE).
 
 ***
 
-_This file was generated by [verb](https://github.com/verbose/verb) on January 25, 2016._
+_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on April 25, 2016._

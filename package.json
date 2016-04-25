@@ -10,7 +10,8 @@
   },
   "license": "MIT",
   "files": [
-    "index.js"
+    "index.js",
+    "lib"
   ],
   "main": "index.js",
   "engines": {
@@ -20,20 +21,59 @@
     "test": "mocha"
   },
   "dependencies": {
-    "ansi": "^0.3.0",
-    "benchmark": "^1.0.0",
-    "chalk": "^1.0.0",
-    "extend-shallow": "^1.1.2",
-    "file-reader": "^1.0.0",
-    "for-own": "^0.1.3",
-    "has-values": "^0.1.2"
+    "ansi": "^0.3.1",
+    "base": "^0.8.1",
+    "base-cwd": "^0.1.6",
+    "base-option": "^0.7.0",
+    "benchmark": "^2.1.0",
+    "define-property": "^0.2.5",
+    "for-own": "^0.1.4",
+    "has-values": "^0.1.4",
+    "inflection": "^1.10.0",
+    "is-glob": "^2.0.1",
+    "kind-of": "^3.0.2",
+    "lazy-cache": "^1.0.4",
+    "log-utils": "^0.1.2",
+    "micromatch": "^2.3.8",
+    "mixin-deep": "^1.1.3",
+    "resolve-glob": "^0.1.8",
+    "vinyl": "^1.1.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^2.0.0",
+    "gulp-format-md": "^0.1.9",
+    "gulp-istanbul": "^0.10.4",
+    "gulp-mocha": "^2.2.0",
+    "gulp-unused": "^0.1.2",
+    "memoize-path": "^0.1.2",
+    "mocha": "^2.4.5"
   },
   "keywords": [
     "benchmark"
   ],
   "verb": {
+    "plugins": [
+      "gulp-format-md"
+    ],
+    "reflinks": [
+      "verb"
+    ],
+    "toc": false,
+    "layout": "default",
+    "lint": {
+      "reflinks": true
+    },
+    "tasks": [
+      "readme"
+    ],
     "related": {
-      "list": []
+      "list": [
+        "base",
+        "base-option",
+        "base-cli",
+        "base-pkg"
+      ]
     }
   }
 }
