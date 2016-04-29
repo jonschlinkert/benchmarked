@@ -362,14 +362,14 @@ Benchmarked.prototype.dryRun = function(pattern, fn) {
       console.log(' · %s', file.key);
     });
   } else {
-    console.log('No matches for patterns: %s', util.inspect(patterns));
+    console.log('No matches for pattern: %s', util.inspect(pattern));
   }
 
   console.log();
   code.files.forEach(function(file) {
     fixtures.forEach(function(fixture) {
       fn(file, fixture);
-    })
+    });
   });
 };
 
