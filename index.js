@@ -43,9 +43,9 @@ Benchmarked.prototype.defaults = function(benchmarked) {
     files: [],
     cache: {},
     toFile: function(file) {
-      file.contents = fs.readFileSync(file.path);
-      file.content = file.contents.toString();
-      file.title = util.format('(%d bytes)', file.content.length);
+      var str = fs.readFileSync(file.path, 'utf8');
+      file.content = utils.reader.file(file);
+      file.title = util.format('(%d bytes)', str.length);
     }
   };
 
@@ -265,8 +265,16 @@ Benchmarked.prototype.addCode = function(file, options) {
  * @api public
  */
 
-Benchmarked.prototype.addSuite = function(fixture, files) {
+Benchmarked.prototype.addSuite = function(fixture) {
   var colors = utils.colors;
+  var files = this.code.files;
+  var opts = this.options;
+
+  if (opts.dryRun === true) {
+    files.forEach(function(file) {
+      console.log(file.run(fixture.content));
+    });
+  }
 
   var suite = new utils.Benchmark.Suite(fixture.title, {
     name: fixture.key,
@@ -278,7 +286,6 @@ Benchmarked.prototype.addSuite = function(fixture, files) {
     }
   });
 
-  files = files || this.code.files;
   files.forEach(function(file) {
     suite.add(file.key, {
       onCycle: function onCycle(event) {
@@ -320,19 +327,49 @@ Benchmarked.prototype.addSuite = function(fixture, files) {
  */
 
 Benchmarked.prototype.run = function(patterns, options) {
-  var files = this.filter('fixtures', patterns, options);
+  var fixtures = this.filter('fixtures', patterns, options);
 
-  if (files.length > 0) {
-    console.log('Benchmarking: (%d of %d)', files.length, this.fixtures.files.length);
-    files.forEach(function(file) {
+  if (fixtures.length > 0) {
+    console.log('Benchmarking: (%d of %d)', fixtures.length, this.fixtures.files.length);
+    fixtures.forEach(function(file) {
       console.log(' · %s', file.key);
     });
   } else {
     console.log('No matches for patterns: %s', util.inspect(patterns));
   }
 
-  files.forEach(function(file) {
+  fixtures.forEach(function(file) {
     file.suite.run();
+  });
+};
+
+Benchmarked.prototype.dryRun = function(pattern, fn) {
+  if (typeof pattern === 'function') {
+    fn = pattern;
+    pattern = '*';
+  }
+
+  if (typeof fn !== 'function') {
+    throw new Error('Expected fn to be a function');
+  }
+
+  var fixtures = this.filter('fixtures', pattern);
+  var code = this.code;
+
+  if (fixtures.length > 0) {
+    console.log('Dry run for (%d of %d) fixtures:', fixtures.length, this.fixtures.files.length);
+    fixtures.forEach(function(file) {
+      console.log(' · %s', file.key);
+    });
+  } else {
+    console.log('No matches for patterns: %s', util.inspect(patterns));
+  }
+
+  console.log();
+  code.files.forEach(function(file) {
+    fixtures.forEach(function(fixture) {
+      fn(file, fixture);
+    })
   });
 };
 
