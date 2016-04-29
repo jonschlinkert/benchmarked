@@ -308,7 +308,7 @@ Benchmarked.prototype.addSuite = function(fixture) {
   }
 
   suite.on('complete', function() {
-    console.log('  fastest is', colors.green(this.filter('fastest').pluck('name')));
+    console.log('  fastest is', colors.green(this.filter('fastest').map('name')));
   });
 
   return suite;
@@ -346,7 +346,7 @@ Benchmarked.prototype.run = function(patterns, options) {
 Benchmarked.prototype.dryRun = function(pattern, fn) {
   if (typeof pattern === 'function') {
     fn = pattern;
-    pattern = '*';
+    pattern = '**/*';
   }
 
   if (typeof fn !== 'function') {
