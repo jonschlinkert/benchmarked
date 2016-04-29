@@ -1,7 +1,7 @@
 {
   "name": "benchmarked",
   "description": "Easily generate benchmarks from a glob of files.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/jonschlinkert/benchmarked",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/benchmarked",
@@ -27,6 +27,7 @@
     "base-option": "^0.7.0",
     "benchmark": "^2.1.0",
     "define-property": "^0.2.5",
+    "file-reader": "^1.1.1",
     "for-own": "^0.1.4",
     "has-values": "^0.1.4",
     "inflection": "^1.10.0",
