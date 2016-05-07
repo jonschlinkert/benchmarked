@@ -78,7 +78,7 @@ Benchmarked.prototype.toFile = function(type, filepath, options) {
 
   file.key = utils.setKey(file, opts);
   file.inspect = function() {
-    return `<${utils.toTitle(type)} ${this.key} "${this.relative}">`;
+    return '<' + utils.toTitle(type) + ' ' + this.key +  '"' + this.relative + '">';
   };
 
   var fn = opts.toFile || this[type].toFile;
@@ -294,12 +294,7 @@ Benchmarked.prototype.addSuite = function(fixture) {
         cursor.write('  ' + event.target);
       },
       fn: function() {
-        var args = fixture.content;
-        if (Array.isArray(args[0])) {
-          file.run.apply(null, args);
-        } else {
-          file.run(args);
-        }
+        file.run.apply(null, fixture.content);
         return;
       },
       onComplete: function() {
