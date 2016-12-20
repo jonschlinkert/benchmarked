@@ -294,7 +294,12 @@ Benchmarked.prototype.addSuite = function(fixture) {
         cursor.write('  ' + event.target);
       },
       fn: function() {
-        file.run.apply(null, fixture.content);
+        var args = fixture.content;
+        if (Array.isArray(args[0])) {
+          file.run.apply(null, args);
+        } else {
+          file.run(args);
+        }
         return;
       },
       onComplete: function() {
