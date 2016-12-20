@@ -25,7 +25,7 @@ var suite = require('benchmarked')({
 suite.run();
 ```
 
-See the [examples](./example) to get a better understanding of how this works.
+See the [examples](./examples) to get a better understanding of how this works.
 
 ## API
 
