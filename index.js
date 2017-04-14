@@ -348,9 +348,15 @@ Benchmarked.prototype.run = function(patterns, options) {
   });
 };
 
-Benchmarked.prototype.dryRun = function(pattern, fn) {
+Benchmarked.prototype.dryRun = function(pattern, options, fn) {
+  if (typeof options === 'function') {
+    fn = options;
+    options = {};
+  }
+
   if (typeof pattern === 'function') {
     fn = pattern;
+    options = {};
     pattern = '**/*';
   }
 
@@ -358,7 +364,7 @@ Benchmarked.prototype.dryRun = function(pattern, fn) {
     throw new Error('Expected fn to be a function');
   }
 
-  var fixtures = this.filter('fixtures', pattern);
+  var fixtures = this.filter('fixtures', pattern, options);
   var code = this.code;
 
   if (fixtures.length > 0) {
