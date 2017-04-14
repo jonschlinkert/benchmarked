@@ -78,7 +78,7 @@ Benchmarked.prototype.toFile = function(type, filepath, options) {
 
   file.key = utils.setKey(file, opts);
   file.inspect = function() {
-    return '<' + utils.toTitle(type) + ' ' + this.key +  '"' + this.relative + '">';
+    return '<' + utils.toTitle(type) + ' ' + this.key + '"' + this.relative + '">';
   };
 
   var fn = opts.toFile || this[type].toFile;
