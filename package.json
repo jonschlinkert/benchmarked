@@ -4,6 +4,11 @@
   "version": "0.2.5",
   "homepage": "https://github.com/jonschlinkert/benchmarked",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+  "contributors": [
+    "James Costian (jamescostian.com)",
+    "Jon Schlinkert <jon.schlinkert@sellside.com> (http://twitter.com/jonschlinkert)",
+    "leesei (https://leesei.github.io)"
+  ],
   "repository": "jonschlinkert/benchmarked",
   "bugs": {
     "url": "https://github.com/jonschlinkert/benchmarked/issues"
@@ -22,36 +27,37 @@
   },
   "dependencies": {
     "ansi": "^0.3.1",
-    "base": "^0.8.1",
-    "base-cwd": "^0.1.6",
-    "base-option": "^0.7.0",
-    "benchmark": "^2.1.0",
+    "base": "^0.13.0",
+    "base-cwd": "^0.3.4",
+    "base-option": "^0.8.4",
+    "benchmark": "^2.1.4",
     "define-property": "^0.2.5",
     "file-reader": "^1.1.1",
-    "for-own": "^0.1.4",
+    "for-own": "^1.0.0",
     "has-values": "^0.1.4",
-    "inflection": "^1.10.0",
-    "is-glob": "^2.0.1",
-    "kind-of": "^3.0.2",
-    "lazy-cache": "^1.0.4",
-    "log-utils": "^0.1.2",
-    "micromatch": "^2.3.8",
-    "mixin-deep": "^1.1.3",
+    "inflection": "^1.12.0",
+    "is-glob": "^3.1.0",
+    "kind-of": "^3.1.0",
+    "lazy-cache": "^2.0.2",
+    "log-utils": "^0.2.1",
+    "micromatch": "^2.3.11",
+    "mixin-deep": "^1.2.0",
     "resolve-glob": "^0.1.8",
-    "vinyl": "^1.1.1"
+    "vinyl": "^2.0.1"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-eslint": "^2.0.0",
-    "gulp-format-md": "^0.1.9",
-    "gulp-istanbul": "^0.10.4",
-    "gulp-mocha": "^2.2.0",
-    "gulp-unused": "^0.1.2",
+    "gulp-eslint": "^3.0.1",
+    "gulp-format-md": "^0.1.12",
+    "gulp-istanbul": "^1.1.1",
+    "gulp-mocha": "^3.0.0",
+    "gulp-unused": "^0.2.1",
     "memoize-path": "^0.1.2",
-    "mocha": "^2.4.5"
+    "mocha": "^3.2.0"
   },
   "keywords": [
-    "benchmark"
+    "benchmark",
+    "benchmarked"
   ],
   "verb": {
     "plugins": [
@@ -71,8 +77,8 @@
     "related": {
       "list": [
         "base",
-        "base-option",
         "base-cli",
+        "base-option",
         "base-pkg"
       ]
     }
