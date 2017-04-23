@@ -57,6 +57,10 @@ Benchmarked.prototype.defaults = function(benchmarked) {
     }
   };
 
+  this.format = function(benchmark) {
+    return '  ' + benchmark;
+  };
+
   if (this.options.fixtures) {
     this.addFixtures(this.options.fixtures);
   }
@@ -291,7 +295,7 @@ Benchmarked.prototype.addSuite = function(fixture) {
       onCycle: function onCycle(event) {
         cursor.horizontalAbsolute();
         cursor.eraseLine();
-        cursor.write('  ' + event.target);
+        cursor.write(opts.format(event.target));
       },
       fn: function() {
         var args = fixture.content;
