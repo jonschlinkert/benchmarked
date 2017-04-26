@@ -37,3 +37,19 @@ describe('benchmarked', function() {
     assert(benchmarked.code.files.length > 0);
   });
 });
+
+describe('build options', function() {
+  it('should have default format option', function() {
+    benchmarked = new Benchmarked({cwd: cwd()});
+    assert.equal(typeof benchmarked.options.format, 'function');
+  });
+
+  it('should override the format option', function() {
+    function formatter() {}
+    benchmarked = new Benchmarked({
+      cwd: cwd(),
+      format: formatter,
+    });
+    assert.equal(benchmarked.options.format, formatter);
+  });
+})
