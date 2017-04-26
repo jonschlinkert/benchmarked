@@ -9,7 +9,7 @@ var suite = new Suite({
     // this is how `benchmark` builds its toString() value
     // in default format: '  ' + benchmark
     var name = benchmark.name;
-    var ops = bm.hz.toFixed(bm.hz < 100 ? 2 : 0);
+    var ops = benchmark.hz.toFixed(benchmark.hz < 100 ? 2 : 0);
     var rme = '\xb1' + benchmark.stats.rme.toFixed(2) + '%';
     var size = benchmark.stats.sample.length;
     var ess  = benchmark.stats.sample.length === 1 ? '' : 's';
