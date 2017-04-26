@@ -57,9 +57,11 @@ Benchmarked.prototype.defaults = function(benchmarked) {
     }
   };
 
-  this.format = function(benchmark) {
-    return '  ' + benchmark;
-  };
+  if (typeof this.options.format !== 'function') {
+    this.options.format = function(benchmark) {
+      return '  ' + benchmark;
+    };
+  }
 
   if (this.options.fixtures) {
     this.addFixtures(this.options.fixtures);
