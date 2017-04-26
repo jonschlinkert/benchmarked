@@ -3,6 +3,9 @@ os:
   - linux
   - osx
 language: node_js
+cache:
+  directories:
+    - node_modules
 node_js:
   - node
   - '7'
