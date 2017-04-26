@@ -41,7 +41,7 @@ describe('benchmarked', function() {
 describe('build options', function() {
   it('should have default format option', function() {
     benchmarked = new Benchmarked({cwd: cwd()});
-    assert.equal(typeof benchmarked.options.format, 'function');
+    assert.equal(typeof benchmarked.format, 'function');
   });
 
   it('should override the format option', function() {
@@ -50,6 +50,6 @@ describe('build options', function() {
       cwd: cwd(),
       format: formatter,
     });
-    assert.equal(benchmarked.options.format, formatter);
+    assert.equal(benchmarked.format, formatter);
   });
 })
