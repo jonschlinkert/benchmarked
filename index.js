@@ -283,6 +283,7 @@ Benchmarked.prototype.addSuite = function(fixture) {
   var colors = utils.colors;
   var files = this.code.files;
   var opts = this.options;
+  var format = this.format;
 
   if (opts.dryRun === true) {
     files.forEach(function(file) {
@@ -305,7 +306,7 @@ Benchmarked.prototype.addSuite = function(fixture) {
       onCycle: function onCycle(event) {
         cursor.horizontalAbsolute();
         cursor.eraseLine();
-        cursor.write(this.format(event.target));
+        cursor.write(format(event.target));
       },
       fn: function() {
         var args = fixture.content;
