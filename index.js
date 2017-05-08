@@ -78,7 +78,6 @@ Benchmarked.prototype.format = function(benchmark) {
   return '  ' + benchmark;
 };
 
-
 /**
  * Create a vinyl file object.
  *
