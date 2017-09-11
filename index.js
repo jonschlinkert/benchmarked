@@ -73,7 +73,7 @@ Benchmarked.prototype.defaults = function(benchmarked) {
     files: [],
     cache: {},
     toFile: function(file) {
-      file.invoke = require(file.path);
+      file.run = require(file.path);
     }
   };
 
@@ -294,7 +294,6 @@ Benchmarked.prototype.addSuite = function(fixture, options) {
   var files = this.code.files;
   var opts = this.options;
   var format = this.format;
-  var self = this;
 
   // capture results for this suite
   var res = {name: fixture.key, file: fixture, results: []};
@@ -303,7 +302,7 @@ Benchmarked.prototype.addSuite = function(fixture, options) {
 
   if (opts.dryRun === true) {
     files.forEach(function(file) {
-      console.log(file.invoke(fixture.content));
+      console.log(file.run(fixture.content));
     });
     return;
   }
@@ -326,7 +325,7 @@ Benchmarked.prototype.addSuite = function(fixture, options) {
         cursor.write(format(event.target));
       },
       fn: function() {
-        return file.invoke.apply(null, utils.arrayify(fixture.content));
+        return file.run.apply(null, utils.arrayify(fixture.content));
       },
       onComplete: function(event) {
         cursor.horizontalAbsolute();
@@ -341,6 +340,7 @@ Benchmarked.prototype.addSuite = function(fixture, options) {
   });
 
   if (files.length <= 1) {
+    this.emit('complete', res);
     return suite;
   }
 
@@ -419,8 +419,6 @@ Benchmarked.prototype.dryRun = function(pattern, options, fn) {
   } else {
     console.log('No matches for pattern: %s', util.inspect(pattern));
   }
-
-
 
   console.log();
   code.files.forEach(function(file) {
