@@ -1,18 +1,38 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var util = require('util');
-var Base = require('base');
-var File = require('vinyl');
-var utils = require('./lib/utils');
-var cursor = utils.ansi(process.stdout);
+/**
+ * Module dependencies
+ */
+
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
+const File = require('vinyl');
+const ansi = require('ansi');
+const Emitter = require('component-emitter');
+const Benchmark = require('benchmark');
+const define = require('define-property');
+const reader = require('file-reader');
+const isGlob = require('is-glob');
+const typeOf = require('kind-of');
+const merge = require('mixin-deep');
+const glob = require('resolve-glob');
+const log = require('log-utils');
+const mm = require('micromatch');
+
+/**
+ * Local variables
+ */
+
+const utils = require('./lib/utils');
+const cursor = ansi(process.stdout);
+const colors = log.colors;
 
 /**
  * Create an instance of Benchmarked with the given `options`.
  *
  * ```js
- * var benchmarks = new Benchmarked();
+ * const suite = new Suite();
  * ```
  * @param {Object} `options`
  * @api public
@@ -22,17 +42,17 @@ function Benchmarked(options) {
   if (!(this instanceof Benchmarked)) {
     return new Benchmarked(options);
   }
-  Base.call(this, null, options);
-  this.use(utils.option());
-  this.use(utils.cwd());
+  Emitter.call(this);
+  this.options = Object.assign({}, options);
+  this.results = [];
   this.defaults(this);
 }
 
 /**
- * Inherit `Base`
+ * Inherit Emitter
  */
 
-Base.extend(Benchmarked);
+util.inherits(Benchmarked, Emitter);
 
 /**
  * Default settings
@@ -43,9 +63,9 @@ Benchmarked.prototype.defaults = function(benchmarked) {
     files: [],
     cache: {},
     toFile: function(file) {
-      var str = fs.readFileSync(file.path, 'utf8');
-      file.content = utils.reader.file(file);
-      file.title = util.format('(%d bytes)', str.length);
+      const str = fs.readFileSync(file.path, 'utf8');
+      file.content = reader.file(file);
+      file.bytes = util.format('(%d bytes)', str.length);
     }
   };
 
@@ -53,7 +73,7 @@ Benchmarked.prototype.defaults = function(benchmarked) {
     files: [],
     cache: {},
     toFile: function(file) {
-      file.run = require(file.path);
+      file.invoke = require(file.path);
     }
   };
 
@@ -86,16 +106,16 @@ Benchmarked.prototype.format = function(benchmark) {
  */
 
 Benchmarked.prototype.toFile = function(type, filepath, options) {
-  var opts = utils.merge({}, this.options, options);
-  var file = new File({path: path.resolve(this.cwd, filepath)});
+  const opts = merge({cwd: this.cwd}, this.options, options);
+  let file = new File({path: path.resolve(opts.cwd, filepath)});
 
   file.key = utils.setKey(file, opts);
   file.inspect = function() {
     return '<' + utils.toTitle(type) + ' ' + this.key + '"' + this.relative + '">';
   };
 
-  var fn = opts.toFile || this[type].toFile;
-  var res = fn.call(this, file);
+  const fn = opts.toFile || this[type].toFile;
+  const res = fn.call(this, file);
   if (utils.isFile(res)) {
     file = res;
   }
@@ -114,20 +134,15 @@ Benchmarked.prototype.filter = function(type, patterns, options) {
     patterns = '*';
   }
 
-  if (Array.isArray(patterns)) {
-    patterns = '{' + patterns.join(',') + '}';
-  }
+  const isMatch = mm.matcher(patterns, options);
+  const results = [];
 
-  var isMatch = utils.mm.matcher(patterns, options);
-  var results = [];
-  var self = this;
-
-  this.fixtures.files.forEach(function(file) {
+  for (let file of this.fixtures.files) {
     if (isMatch(file.basename)) {
-      file.suite = self.addSuite(file);
+      file.suite = this.addSuite(file, options);
       results.push(file);
     }
-  });
+  }
   return results;
 };
 
@@ -139,7 +154,7 @@ Benchmarked.prototype.filter = function(type, patterns, options) {
  */
 
 Benchmarked.prototype.match = function(type, patterns, options) {
-  return utils.mm.matchKeys(this[type].files, patterns, options);
+  return mm.matchKeys(this[type].files, patterns, options);
 };
 
 /**
@@ -150,11 +165,10 @@ Benchmarked.prototype.match = function(type, patterns, options) {
  */
 
 Benchmarked.prototype.addFile = function(type, file, options) {
-  if (utils.isGlob(file) || Array.isArray(file)) {
+  if (isGlob(file) || Array.isArray(file)) {
     return this.addFiles.apply(this, arguments);
   }
 
-  type = utils.type(type);
   if (typeof file === 'string') {
     file = this.toFile(type, file, options);
   }
@@ -176,11 +190,11 @@ Benchmarked.prototype.addFile = function(type, file, options) {
  */
 
 Benchmarked.prototype.addFiles = function(type, files, options) {
-  var opts = utils.merge({cwd: this.cwd}, this.options, options);
-  switch (utils.typeOf(files)) {
+  const opts = merge({cwd: this.cwd}, this.options, options);
+  switch (typeOf(files)) {
     case 'string':
-      if (utils.isGlob(files)) {
-        this.addFiles(type, utils.glob.sync(files, opts), options);
+      if (isGlob(files)) {
+        this.addFiles(type, glob.sync(files, opts), options);
       } else {
         this.addFile(type, files, options);
       }
@@ -207,8 +221,8 @@ Benchmarked.prototype.addFiles = function(type, files, options) {
  */
 
 Benchmarked.prototype.addFilesArray = function(type, files, options) {
-  for (var i = 0; i < files.length; i++) {
-    this.addFile(type, files[i], options);
+  for (let file of files) {
+    this.addFile(type, file, options);
   }
   return this;
 };
@@ -220,10 +234,8 @@ Benchmarked.prototype.addFilesArray = function(type, files, options) {
  */
 
 Benchmarked.prototype.addFilesObject = function(type, files, options) {
-  for (var key in files) {
-    if (files.hasOwnProperty(key)) {
-      this.addFile(type, files[key], options);
-    }
+  for (let key in Object.keys(files)) {
+    this.addFile(type, files[key], options);
   }
   return this;
 };
@@ -267,7 +279,7 @@ Benchmarked.prototype.addFixtures = function(files, options) {
  */
 
 Benchmarked.prototype.addCode = function(file, options) {
-  this.addFile('code', file, options);
+  this.addFiles('code', file, options);
   return this;
 };
 
@@ -278,56 +290,65 @@ Benchmarked.prototype.addCode = function(file, options) {
  * @api public
  */
 
-Benchmarked.prototype.addSuite = function(fixture) {
-  var colors = utils.colors;
+Benchmarked.prototype.addSuite = function(fixture, options) {
   var files = this.code.files;
   var opts = this.options;
   var format = this.format;
+  var self = this;
+
+  // capture results for this suite
+  var res = {name: fixture.key, file: fixture, results: []};
+  define(res, 'fixture', fixture);
+  this.results.push(res);
 
   if (opts.dryRun === true) {
     files.forEach(function(file) {
-      console.log(file.run(fixture.content));
+      console.log(file.invoke(fixture.content));
     });
+    return;
   }
 
-  var suite = new utils.Benchmark.Suite(fixture.title, {
+  var suite = new Benchmark.Suite(fixture.bytes, {
     name: fixture.key,
     onStart: function onStart() {
-      console.log(colors.cyan('\n# %s %s'), fixture.relative, fixture.title);
+      console.log(colors.cyan('\n# %s %s'), fixture.relative, fixture.bytes);
     },
     onComplete: function() {
       cursor.write('\n');
     }
   });
 
-  files.forEach(function(file) {
-    suite.add(file.key, {
+  files.forEach((file) => {
+    suite.add(file.key, Object.assign({
       onCycle: function onCycle(event) {
         cursor.horizontalAbsolute();
         cursor.eraseLine();
         cursor.write(format(event.target));
       },
       fn: function() {
-        var args = fixture.content;
-        if (Array.isArray(args[0])) {
-          file.run.apply(null, args);
-        } else {
-          file.run(args);
-        }
-        return;
+        return file.invoke.apply(null, utils.arrayify(fixture.content));
       },
-      onComplete: function() {
+      onComplete: function(event) {
+        cursor.horizontalAbsolute();
+        cursor.eraseLine();
+        cursor.write(format(event.target));
         cursor.write('\n');
-      }
-    });
+        res.results.push(utils.captureBench(event, file));
+      },
+      onAbort: this.emit.bind(this, 'error'),
+      onError: this.emit.bind(this, 'error')
+    }, options));
   });
 
   if (files.length <= 1) {
     return suite;
   }
 
-  suite.on('complete', function() {
-    console.log('  fastest is', colors.green(this.filter('fastest').map('name')));
+  suite.on('complete', () => {
+    var fastest = suite.filter('fastest').map('name');
+    res.fastest = fastest;
+    this.emit('complete', res);
+    console.log('  fastest is', colors.green(fastest));
   });
 
   return suite;
@@ -345,7 +366,12 @@ Benchmarked.prototype.addSuite = function(fixture) {
  * @api public
  */
 
-Benchmarked.prototype.run = function(patterns, options) {
+Benchmarked.prototype.run = function(patterns, options, cb) {
+  if (typeof options === 'function') {
+    cb = options;
+    options = { async: true };
+  }
+
   var fixtures = this.filter('fixtures', patterns, options);
 
   if (fixtures.length > 0) {
@@ -358,14 +384,16 @@ Benchmarked.prototype.run = function(patterns, options) {
   }
 
   fixtures.forEach(function(file) {
-    file.suite.run();
+    file.suite.run(options);
   });
+
+  this.emit('end', this.results);
 };
 
 Benchmarked.prototype.dryRun = function(pattern, options, fn) {
   if (typeof options === 'function') {
     fn = options;
-    options = {};
+    options = null;
   }
 
   if (typeof pattern === 'function') {
@@ -375,20 +403,24 @@ Benchmarked.prototype.dryRun = function(pattern, options, fn) {
   }
 
   if (typeof fn !== 'function') {
-    throw new Error('Expected fn to be a function');
+    throw new TypeError('Expected fn to be a function');
   }
 
-  var fixtures = this.filter('fixtures', pattern, options);
+  var opts = Object.assign({ async: true }, options);
+  var fixtures = this.filter('fixtures', pattern, opts);
+  var len = this.fixtures.files.length;
   var code = this.code;
 
   if (fixtures.length > 0) {
-    console.log('Dry run for (%d of %d) fixtures:', fixtures.length, this.fixtures.files.length);
+    console.log('Dry run for (%d of %d) fixtures:', fixtures.length, len);
     fixtures.forEach(function(file) {
       console.log(' · %s', file.key);
     });
   } else {
     console.log('No matches for pattern: %s', util.inspect(pattern));
   }
+
+
 
   console.log();
   code.files.forEach(function(file) {
@@ -397,6 +429,76 @@ Benchmarked.prototype.dryRun = function(pattern, options, fn) {
     });
   });
 };
+
+Benchmarked.run = function(options) {
+  const opts = Object.assign({cwd: process.cwd()}, options);
+
+  if (fs.existsSync(path.join(opts.cwd, 'benchmark'))) {
+    opts.cwd = path.join(opts.cwd, 'benchmark');
+  }
+
+  return new Promise(function(resolve, reject) {
+    const suite = new Benchmarked({
+      cwd: __dirname,
+      fixtures: path.join(opts.cwd, opts.fixtures),
+      code: path.join(opts.cwd, opts.code)
+    });
+
+    suite.on('error', reject);
+
+    if (opts.dry) {
+      suite.dryRun(function(code, fixture) {
+        console.log(colors.cyan('%s > %s'), code.key, fixture.key);
+        const args = require(fixture.path).slice();
+        const expected = args.pop();
+        const actual = code.invoke.apply(null, args);
+        console.log(expected, actual);
+        console.log();
+        resolve();
+      });
+    } else {
+      suite.on('end', resolve);
+      suite.run();
+    }
+  });
+};
+
+Benchmarked.render = function(benchmarks) {
+  const res = [];
+  for (let i = 0; i < benchmarks.length; i++) {
+    const target = benchmarks[i];
+    let b = `# ${target.name} ${target.file.bytes}\n`;
+
+    for (let i = 0; i < target.results.length; i++) {
+      const stats = target.results[i];
+      b += `  ${stats.name} x ${stats.ops} ops/sec ±${stats.rme}%`;
+      b += ` (${stats.runs} runs sampled)\n`;
+    }
+
+    b += `\n  fastest is ${target.fastest.join(', ')}`;
+    b += ` (by ${diff(target)} avg)\n`;
+    res.push(b);
+  }
+  return res.join('\n');
+};
+
+function diff(target) {
+  let len = target.results.length;
+  let fastest = 0;
+  let rest = 0;
+
+  for (let i = 0; i < len; i++) {
+    let stats = target.results[i];
+
+    if (target.fastest.indexOf(stats.name) !== -1) {
+      fastest = +stats.hz;
+    } else {
+      rest += +stats.hz;
+    }
+  }
+  var avg = (fastest / (+rest / (len - 1)) * 100);
+  return avg.toFixed() + '%';
+}
 
 /**
  * Expose `Benchmarked`

@@ -46,10 +46,7 @@ describe('build options', function() {
 
   it('should override the format option', function() {
     function formatter() {}
-    benchmarked = new Benchmarked({
-      cwd: cwd(),
-      format: formatter,
-    });
+    benchmarked = new Benchmarked({cwd: cwd(), format: formatter});
     assert.equal(benchmarked.format, formatter);
   });
 })
