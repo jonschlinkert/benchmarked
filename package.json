@@ -35,7 +35,7 @@
     "has-values": "^1.0.0",
     "inflection": "^1.12.0",
     "is-glob": "^4.0.0",
-    "kind-of": "^5.0.2",
+    "kind-of": "^6.0.3",
     "log-utils": "^0.2.1",
     "micromatch": "^3.0.4",
     "mixin-deep": "^1.2.0",
